@@ -7,12 +7,12 @@
 {{ $min_count := mul (len (index .ByCount.Reverse 0).Pages) 1.0 }}
 
 {{/* Max and min font sizes in rem units */}}
-{{ $max_size := (site.Params.cloud_max_rem | default 1.34) }}
-{{ $min_size := (site.Params.cloud_min_rem | default 1.0) }}
+{{ $max_size := (site.Params.cloud_max_rem | float) | default 1.34 }}
+{{ $min_size := (site.Params.cloud_min_rem | float) | default 1.0 }}
 
 {{/* Max and min font weights */}}
-{{ $max_weight := site.Params.cloud_max_weight | default 800 }}
-{{ $min_weight := site.Params.cloud_min_weight | default 300 }}
+{{ $max_weight := (site.Params.cloud_max_weight | int) | default 800 }}
+{{ $min_weight := (site.Params.cloud_min_weight | int) | default 300 }}
 
 <div id="category-cloud">
 
