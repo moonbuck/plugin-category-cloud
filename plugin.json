@@ -14,7 +14,7 @@
         {
           "field": "params.cloud_min_rem",
           "label": "Min Font Size (rem)",
-          "placeholder": 1.0
+          "placeholder": 0.9
         },
         {
           "field": "params.cloud_max_weight",
@@ -24,12 +24,12 @@
         {
           "field": "params.cloud_min_weight",
           "label": "Min Font Weight",
-          "placeholder": 300
+          "placeholder": 200
         },
         {
           "field": "params.cloud_exclusion_list",
           "label": "Cloud Exclusion List",
-          "placeholder": "[\"pinned\", \"some-other-category\"]"
+          "placeholder": "Pinned, Some Other Category"
         }
       ]
     }

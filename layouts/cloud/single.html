@@ -16,9 +16,7 @@
 
 {{ $exclusion_list := slice "" }}
 {{ with site.Params.cloud_exclusion_list }}
-{{ with unmarshal . }}
-{{ if (reflect.IsSlice .) }}{{ $exclusion_list = . }}{{ end }}
-{{ end }}
+  {{ $exclusion_list = apply (split . ",") "anchorize" "." }}
 {{ end }}
 
 <div id="category-cloud">
