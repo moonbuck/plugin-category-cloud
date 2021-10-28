@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "title": "Moondeer's Category Cloud",
     "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud.",
     "includes": [
@@ -25,6 +25,11 @@
           "field": "params.cloud_min_weight",
           "label": "Min Font Weight",
           "placeholder": 300
+        },
+        {
+          "field": "params.cloud_exclusion_list",
+          "label": "Cloud Exclusion List",
+          "placeholder": "[\"pinned\", \"some-other-category\"]"
         }
       ]
     }
