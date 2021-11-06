@@ -35,7 +35,7 @@
   {{- $font_weight := mul $max_weight $percent_max_count }}
   {{- if (lt $font_weight $min_weight) }}{{ $font_weight = $min_weight }}{{ end }}
   {{- $fract_weight := mod $font_weight 100 }}
-  {{- $font_weight = cond (eq $fract_weight 0) $font_weight (add (sub $font_weight $fract_weight) (cond (ge $fract_weight 50) 100 0)) }}
+  {{- $font_weight = cond (eq $fract_weight 0) $font_weight (add (sub $font_weight $fract_weight) (cond (ge $fract_weight 50) 100 0)) -}}
 
 <a 
   href="{{ "/categories/" | relLangURL }}{{ $name | urlize }}"
