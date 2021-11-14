@@ -1,6 +1,6 @@
 # plugin-category-cloud
 
-![Category Cloud Screenshot](https://raw.githubusercontent.com/moonbuck/plugin-category-cloud/main/category-cloud.jpeg)
+![Category Cloud Screenshot](https://raw.githubusercontent.com/moonbuck/plugin-category-cloud/main/images/category-cloud.jpeg)
 
 A plugin for [Micro.blog](https://micro.blog "Micro.blog") that creates a page displaying links to your categories layed out as a category cloud. It is based upon the category cloud plugin you might already know and love that lives [here](https://github.com/chtny/plugin-category-cloud).
 
@@ -8,7 +8,7 @@ Once installed, the generated page will be found at `[SCHEME]://[HOSTNAME]/cloud
 
 Let’s have a look at the parameters:
 
-![Plugin Parameters](https://raw.githubusercontent.com/moonbuck/plugin-category-cloud/main/plugin_parameters.jpeg)
+![Plugin Parameters](https://raw.githubusercontent.com/moonbuck/plugin-category-cloud/main/images/plugin_parameters.jpeg)
 
 The maximum and minum font sizes for the links are in [rem](https://www.sitepoint.com/understanding-and-using-rem-units-in-css/ "Understanding and Using REM Units in CSS") units. The maximum and minimum font weights are expected to be [integer](https://www.w3schools.com/cssref/pr_font_weight.asp "CSS Font Weight Property") values.
 

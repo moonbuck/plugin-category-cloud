@@ -1,57 +1,233 @@
-{{- define "main" }}
+{{- define "main" -}}
 
-{{- with site.Taxonomies.categories }}
+  {{- if site.Taxonomies.categories -}}
 
-{{- /* Max and min page counts */}}
-{{- $max_count := mul (len (index .ByCount 0).Pages) 1.0 }}
-{{- $min_count := mul (len (index .ByCount.Reverse 0).Pages) 1.0 }}
+    {{- /* Resolve plugin parameters */ -}}
+    {{- $scratch := newScratch -}}
+    
+    {{- /* Insert the default values */ -}}
+    {{- $scratch.SetInMap "params" "MaxSize" 1.34 -}}
+    {{- $scratch.SetInMap "params" "MinSize" 0.9 -}}
+    {{- $scratch.SetInMap "params" "MaxWeight" 800 -}}
+    {{- $scratch.SetInMap "params" "MinWeight" 200 -}}
+    {{- $scratch.SetInMap "params" "Humanize" true -}}
+    {{- $scratch.SetInMap "params" "MenuItemMatching" true -}}
+    {{- $scratch.SetInMap "params" "Class" "category-cloud-link" -}}
+    {{- $scratch.SetInMap "params" "ExclusionList" slice -}}
+    
+    {{- /* Gather menu entries */ -}}
+    {{- range site.Menus.main -}}
+      
+      {{- /* Store menu item URLs keyed by last path component */ -}}
+      {{- $scratch.SetInMap "menu_urls" (path.Base .URL) .URL -}}
+    
+    {{- end -}}
+    
+    {{- /* Resolve the data file */ -}}
+    {{- $data_file := site.Data.plugin_category_cloud_params -}}
+    {{- $data_file = $data_file | default site.Data.plugin_category_cloud.params -}}
+    
+    {{- /* Overwrite defaults with any data file values */ -}}
+    {{- with $data_file -}}
+    
+      {{- with .MaxSize -}}
+        {{- $scratch.SetInMap "params" "MaxSize" . -}}
+      {{- end -}}
+    
+      {{- with .MinSize }}
+        {{- $scratch.SetInMap "params" "MinSize" . -}}
+      {{- end -}}
+    
+      {{- with .MaxWeight -}}
+        {{- $scratch.SetInMap "params" "MaxWeight" . -}}
+      {{- end -}}
+    
+      {{- with .MinWeight -}}
+        {{- $scratch.SetInMap "params" "MinWeight" . -}}
+      {{- end -}}
+    
+      {{- if (isset . "Humanize") -}}
+        {{- $scratch.SetInMap "params" "Humanize" .Humanize -}}
+      {{- end -}}
+    
+      {{- if (isset . "MenuItemMatching") -}}
+        {{- $scratch.SetInMap "params" "MenuItemMatching" .MenuItemMatching -}}
+      {{- end -}}
 
-{{- /* Max and min font sizes in rem units */}}
-{{- $max_size := 1.34 }}
-{{- with (site.Data.plugin_category_cloud_params.Font.Size.Max | default site.Params.cloud_max_rem) }}{{ $max_size = . | float }}{{ end }}
-{{- $min_size := 0.9 }}
-{{- with (site.Data.plugin_category_cloud_params.Font.Size.Min | default site.Params.cloud_min_rem) }}{{ $min_size = . | float }}{{ end }}
-
-{{- /* Max and min font weights */}}
-{{- $max_weight := 800 }}
-{{- with (site.Data.plugin_category_cloud_params.Font.Weight.Max | default site.Params.cloud_max_weight) }}{{ $max_weight = . | int }}{{ end }}
-{{- $min_weight := 200 }}
-{{- with (site.Data.plugin_category_cloud_params.Font.Weight.Min | default site.Params.cloud_min_weight) }}{{ $min_weight = . | int }}{{ end }}
-
-{{- $exclusion_list := slice "" }}
-{{- with site.Data.plugin_category_cloud_params.ExcludeCategories -}}
-{{- $exclusion_list = . -}}
-{{- else -}}
-  {{- with site.Params.cloud_exclusion_list }}
-    {{- $exclusion_list = apply (split . ",") "anchorize" "." }}
-  {{- end }}
-{{- end -}}
-
-<div id="category-cloud">
-
-{{- range $name, $taxonomy := . }}
-
-{{- if not (in $exclusion_list $name )}}
-  {{- $page_count := len $taxonomy.Pages }}
-  {{- $percent_max_count := div $page_count ($max_count) }}
-  {{- $font_size := mul $max_size $percent_max_count }}
-  {{- if (lt $font_size $min_size) }}{{ $font_size = $min_size }}{{ end }}
-  {{- $font_weight := mul $max_weight $percent_max_count }}
-  {{- if (lt $font_weight $min_weight) }}{{ $font_weight = $min_weight }}{{ end }}
-  {{- $fract_weight := mod $font_weight 100 }}
-  {{- $font_weight = cond (eq $fract_weight 0) $font_weight (add (sub $font_weight $fract_weight) (cond (ge $fract_weight 50) 100 0)) -}}
-
-<a 
-  href="{{ "/categories/" | relLangURL }}{{ $name | urlize }}"
-  class="category-cloud-link"
-  style="font-size:{{ $font_size }}rem; font-weight:{{ $font_weight }}"
-  >{{ $name }}({{ $page_count }})</a>
+      {{- with .Class -}}
+        {{- $scratch.SetInMap "params" "Class" . -}}
+      {{- end -}}
+    
+      {{- with .ExclusionList -}}
+        
+        {{- /* Ensure the values are in anchorized form */ -}}
+        {{- $list := apply . "anchorize" "." -}}
+      
+        {{- /* Store the list */ -}}
+        {{- $scratch.SetInMap "params" "ExclusionList" $list -}}
+        
+      {{- end -}}
+    
+    {{- end -}}{{- /* Close with */ -}}
+    
+    {{- /* Overwrite with any plugin parameter interface values */ -}}
+    {{- with site.Params.cloud_max_rem -}}
+      {{- $scratch.SetInMap "params" "MaxSize" (. | float) -}}
+    {{- end -}}
   
-  {{- end }}
-{{- end }}
+    {{- with site.Params.cloud_min_rem -}}
+      {{- $scratch.SetInMap "params" "MinSize" (. | float) -}}
+    {{- end -}}
+  
+    {{- with site.Params.cloud_max_weight -}}
+      {{- $scratch.SetInMap "params" "MaxWeight" (. | int) -}}
+    {{- end -}}
+  
+    {{- with site.Params.cloud_min_weight -}}
+      {{- $scratch.SetInMap "params" "MinWeight" (. | int) -}}
+    {{- end -}}
+  
+    {{- with site.Params.cloud_humanize -}}
+      {{- if (in (slice "true" "false") .) -}}
+        {{- $scratch.SetInMap "params" "Humanize" (eq . "true") -}}
+      {{- end -}}
+    {{- end -}}
+  
+    {{- with site.Params.cloud_menu_item_matching -}}
+      {{- if (in (slice "true" "false") .) -}}
+        {{- $scratch.SetInMap "params" "MenuItemMatching" (eq . "true") -}}
+      {{- end -}}
+    {{- end -}}
 
-</div>
+    {{- with site.Params.cloud_class -}}
+      {{- $scratch.SetInMap "params" "Class" . }}
+    {{- end -}}
+  
+    {{- with site.Params.cloud_exclusion_list -}}
+      
+      {{- /* Split the string with comma as delimiter */ -}}
+      {{- $list := split . "," -}}
+      
+      {{- /* Trim off any whitespace */ -}}
+      {{- $list = apply $list "trim" "." " \t\n" -}}
+      
+      {{- /* Ensure the values are in anchorized form */ -}}
+      {{- $list = apply $list "anchorize" "." -}}
+      
+      {{- /* Store the list */ -}}
+      {{- $scratch.SetInMap "params" "ExclusionList" $list -}}
 
-{{- end }}
+    {{- end -}}
+    
+    {{- /* Pull the parameter values out of the scratch map */}}
+    {{- $params := $scratch.Get "params" -}}
+    {{- $max_size := $params.MaxSize -}}
+    {{- $min_size := $params.MinSize -}}
+    {{- $max_weight := $params.MaxWeight -}}
+    {{- $min_weight := $params.MinWeight -}}
+    {{- $humanize := $params.Humanize -}}
+    {{- $menu_item_matching := $params.MenuItemMatching -}}
+    {{- $menu_urls := cond $menu_item_matching ($scratch.Get "menu_urls") dict -}}
+    {{- $exclusion_list := $params.ExclusionList -}}
+    {{- $class := $params.Class -}}    
+    
+    {{- /* Resolve provided display name values */ -}}
+    {{- $names := site.Data.plugin_category_cloud_display_names -}}
+    {{- $names = $names | default site.Data.plugin_category_cloud.display_names -}}
+    {{- $names = $names | default dict -}}
+    
+    {{- /* Calculate max category page count */}}
+    {{- $max := len (index site.Taxonomies.categories.ByCount 0).Pages }}
+    
+    {{- /* Open up the div tag for the cloud */ -}}
+    <div id="category-cloud">
+    
+    {{- /* Iterate the categories */ -}}
+    {{- range $anchorized_name, $taxonomy := site.Taxonomies.categories }}
+    
+    {{- /* Guard against categories in the exclusion list */ -}}
+    {{- if not (in $exclusion_list $anchorized_name) -}}
+    
+      {{- /* Determine how many pages the category holds */ -}}
+      {{- $count := len $taxonomy.Pages -}}
+      
+      {{- /* Calculate percent of max_count that count represents */ -}}
+      {{- $percent := div ($count | float) $max -}}
+      
+      {{- /* Multiply the max size by the calculated percent */ -}}
+      {{- $size := mul $max_size $percent -}}
+      {{- if (lt $size $min_size) }}{{ $size = $min_size }}{{ end -}}
+      
+      {{- /* Multiply the max weight by the calculated percent */ -}}  
+      {{- $weight := mul $max_weight $percent -}}
+      {{- if (lt $weight $min_weight) }}{{ $weight = $min_weight }}{{ end -}}
+      
+      {{- /* CSS weights increment by 100, check for fractional part */ -}}  
+      {{- with mod $weight 100 -}}
+      
+        {{- /* Get the integer part */ -}}
+        {{- $integer := sub $weight . -}}
+        
+        {{- /* Branch based on whether we're rounding up or down */ -}}
+        {{- if (ge . 50) -}}
+        
+          {{- /* Round up */ -}}
+          {{- $weight = add $integer 100 -}}
+        
+        {{- else -}}
+        
+          {{- /* Round down */ -}}
+          {{- $weight = $integer -}}
+        
+        {{- end -}}{{- /* Close if */ -}}
+        
+      {{- end -}}{{- /* Close if */ -}}
+      
+      {{- /* Generate the category URL */ -}}
+      {{- $href := path.Join ("/categories/" | relLangURL) $anchorized_name }}
+      {{- with (index $menu_urls $anchorized_name) }}{{ $href = . }}{{ end -}}
+      
+      {{- /* Generate the style attribute */ -}}
+      {{- $style := printf "font-size:%vrem;font-weight:%v" $size $weight -}}
+      
+      {{- /* Generate the display name, defaulting to the anchorized form */ -}}
+      {{- $name := $anchorized_name -}}
+      
+      {{- /* Check for an explicit entry for this category */ -}}
+      {{- with (index $names $name) -}}
+      
+        {{- $name = . -}}
+      
+      {{- /* Otherwise, handle humanizing when specified */ -}}
+      {{- else -}}
+      
+        {{- if $humanize -}}
+        
+          {{- $name = delimit (apply (split $name "-") "humanize" ".") " " -}}
+        
+        {{- end -}}
+      
+      {{- end -}}
+      
+      {{- /* Generate the visible text */ -}}
+      {{- $text := printf "%s (%v)" $name $count -}}
+      
+      {{- /* Generate the anchor tag for this category */ -}}
+      
+  <a href="{{ $href | safeURL }}" 
+     class="{{ $class }}" 
+     style="{{ $style | safeCSS }}">
+     
+    {{- $text -}}
+    
+  </a>
+      
+      {{- end -}}{{- /* Close if */ -}}
+      
+    {{- end -}}{{- /* Close range */ -}}
+    
+    </div>
+  
+  {{- end -}}{{- /* Close if */ -}}
 
-{{- end }}
+{{- end -}}{{- /* Close block */ -}}

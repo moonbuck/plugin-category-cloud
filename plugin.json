@@ -1,35 +1,50 @@
 {
-    "version": "2.0.0",
-    "title": "Moondeer's Category Cloud",
-    "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud.",
-    "includes": [
-        "/assets/css/category-cloud.css"
-      ],
-      "fields": [
-        {
-          "field": "params.cloud_max_rem",
-          "label": "Max Font Size (rem)",
-          "placeholder": 1.34
-        },
-        {
-          "field": "params.cloud_min_rem",
-          "label": "Min Font Size (rem)",
-          "placeholder": 0.9
-        },
-        {
-          "field": "params.cloud_max_weight",
-          "label": "Max Font Weight",
-          "placeholder": 800
-        },
-        {
-          "field": "params.cloud_min_weight",
-          "label": "Min Font Weight",
-          "placeholder": 200
-        },
-        {
-          "field": "params.cloud_exclusion_list",
-          "label": "Cloud Exclusion List",
-          "placeholder": "Pinned, Some Other Category"
-        }
-      ]
+  "version": "3.0.0",
+  "title": "Moondeer's Category Cloud",
+  "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud.",
+  "includes": [
+    "/assets/css/category-cloud.css"
+  ],
+  "fields": [
+    {
+      "field": "params.cloud_max_rem",
+      "label": "Max Font Size (rem)",
+      "placeholder": 1.34
+     },
+     {
+        "field": "params.cloud_min_rem",
+        "label": "Min Font Size (rem)",
+        "placeholder": 0.9
+     },
+     {
+        "field": "params.cloud_max_weight",
+        "label": "Max Font Weight",
+        "placeholder": 800
+    },
+    {
+        "field": "params.cloud_min_weight",
+        "label": "Min Font Weight",
+        "placeholder": 200
+    },
+    {
+      "field": "params.cloud_humanize",
+      "label": "Humanize",
+      "placeholder": true
+    },
+    {
+      "field": "params.cloud_menu_item_matching",
+      "label": "Menu Item Matching",
+      "placeholder": true
+    },
+    {
+      "field": "params.cloud_class",
+      "label": "Class",
+      "placeholder": "category-cloud-link"
+    },
+    {
+        "field": "params.cloud_exclusion_list",
+      "label": "Cloud Exclusion List",
+      "placeholder": "Pinned, Some Other Category"
     }
+  ]
+}

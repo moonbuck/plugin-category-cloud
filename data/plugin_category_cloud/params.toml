@@ -1,0 +1,41 @@
+# Max font size to use in the cloud in rem units.
+#
+MaxSize = 1.34
+
+# Min font size to use in the cloud in rem units.
+#
+MinSize = 0.9
+
+# Max font weight to use in the cloud.
+#
+MaxWeight = 800
+
+# Min font weight to use in the cloud.
+#
+MinWeigth = 200
+
+# Category names are fetched in their anchorized form.
+# Setting this parameter to true will convert anchorized
+# forms into capitalized and spaced forms.
+#
+#   my-category => My Category
+#
+Humanize = true
+
+# The default path to a category page takes the form:
+#  /categories/my-anchorized-category
+# 
+# If the category has been lifted into the main menu,
+# and its path has been altered (perhapse dropping /categories)
+# the plugin can try to match a category to its menu item and
+# use the URL value of the menu item.
+#
+MenuItemMatching = true
+
+# Class to set on the cloud's category <a> tags.
+#
+Class = 'category-cloud-link'
+
+# List of categories to exclude from the category cloud.
+#
+ExclusionList = [ ]
