@@ -84,7 +84,7 @@ ExclusionList = [ ]
 
 ### Examples
 #### `ExclusionList`
-[moondeer.blog](https://moondeer.blog) is configured to include a ‘Pinned’ category. None of the screenshots, however, happen to include such a category. The reason is that I have configured the value of `ExclusionList` like so:
+[moondeer.blog](https://moondeer.blog) is configured to include a *Pinned* category. None of the screenshots, however, happen to include such a category. The reason is that I have configured the value of `ExclusionList` like so:
 
 ```TOML
 ExclusionList = ['Pinned]
