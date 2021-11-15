@@ -1,8 +1,0 @@
-# The plugin fetches the category names in anchorized form.
-# The 'Humanize' parameter will return the category names
-# to their capitalized and spaced form. For direct control
-# over how category name will be displayed, enter its value
-# below with its anchorized form as the key.
-#
-# my-category = My Category
-#

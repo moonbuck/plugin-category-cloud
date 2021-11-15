@@ -15,6 +15,7 @@
     {{- $scratch.SetInMap "params" "Class" "category-cloud-link" -}}
     {{- $scratch.SetInMap "params" "DisplayPageCounts" true -}}
     {{- $scratch.SetInMap "params" "ExclusionList" slice -}}
+    {{- $scratch.SetInMap "params" "DisplayNames" dict -}}
     
     {{- /* Gather menu entries */ -}}
     {{- range site.Menus.main -}}
@@ -71,6 +72,10 @@
         {{- /* Store the list */ -}}
         {{- $scratch.SetInMap "params" "ExclusionList" $list -}}
         
+      {{- end -}}
+      
+      {{- with .DisplayNames -}}
+        {{- $scratch.SetInMap "params" "DisplayNames" . -}}
       {{- end -}}
     
     {{- end -}}{{- /* Close with */ -}}
@@ -140,13 +145,9 @@
     {{- $menu_item_matching := $params.MenuItemMatching -}}
     {{- $menu_urls := cond $menu_item_matching ($scratch.Get "menu_urls") dict -}}
     {{- $display_page_counts := $params.DisplayPageCounts -}}
-    {{- $exclusion_list := $params.ExclusionList -}}
     {{- $class := $params.Class -}}    
-    
-    {{- /* Resolve provided display name values */ -}}
-    {{- $names := site.Data.plugin_category_cloud_display_names -}}
-    {{- $names = $names | default site.Data.plugin_category_cloud.display_names -}}
-    {{- $names = $names | default dict -}}
+    {{- $exclusion_list := $params.ExclusionList -}}
+    {{- $display_names := $params.DisplayNames -}}
     
     {{- /* Create a slice to hold a filtered list of categories */ -}}
     {{- $categories := slice -}}
@@ -228,7 +229,7 @@
       {{- $name := $anchorized_name -}}
       
       {{- /* Check for an explicit entry for this category */ -}}
-      {{- with (index $names $name) -}}
+      {{- with (index $display_names $name) -}}
       
         {{- $name = . -}}
       

@@ -18,7 +18,7 @@ MinWeigth = 200
 # Setting this parameter to true will convert anchorized
 # forms into capitalized and spaced forms.
 #
-#   my-category => My Category
+#   my-category → My Category
 #
 Humanize = true
 
@@ -43,4 +43,21 @@ Class = 'category-cloud-link'
 
 # List of categories to exclude from the category cloud.
 #
+# For example: ['Pinned', 'Temporary']
+#
 ExclusionList = [ ]
+
+# The plugin fetches the category names in anchorized form.
+# The 'Humanize' parameter will return the category names
+# to their capitalized and spaced form. The DisplayNames
+# parameter allows for direct control over how a category
+# name will be displayed
+#
+[DisplayNames]
+
+# To define exactly how to display a specific category name 
+# enter its value below with its anchorized form as the key.
+# My use case for this option is this category:
+#
+# stream-of-consciousness = 'Stream of Conscioussness'
+#
