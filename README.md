@@ -192,7 +192,7 @@ I am able to put the period back into *Micro.blog* and correct the capitalizatio
 
 By creating content files within a custom theme, it is totally possible to change the path to a category’s page. I happen to create files for all my categories so I am able to control various page level attributes. For categories that I also include in the main navigation menu, I also alter their URLs to remove `/categories`. Take the category page for [Critters](https://moondeer.blog/critters/ "Critters"), for example:
 
-```TOML
+```md
 +++
 title = 'Critters'
 description = 'All things critter-related.'
@@ -215,7 +215,7 @@ Since the plugin generates URLs for the categories that include `/categories` by
 
 The file living at `content/cloud.md` specifies the front matter for the page.
 
-```TOML
+```md
 +++
 title = 'Cloud'
 description = 'A category cloud weighted by posts per category.'
