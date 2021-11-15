@@ -14,10 +14,6 @@
     {{- /* Unpack the parameter values from scratch  */ -}}       
     {{- with ($scratch.Get "Params") -}}
     
-    {{- if templates.Exists "partials/debugging/paragraph-print-map.html" -}}
-      {{ partial "debugging/paragraph-print-map.html" . }}
-    {{- end -}}
-    
 {{- /* Open up the div tag for the cloud */ -}}
 <div id="category-cloud">
     
