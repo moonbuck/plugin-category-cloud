@@ -45,10 +45,6 @@
       "field": "params.cloud_display_page_counts",
       "label": "Display Page Counts",
       "placeholder": "true"
-    },
-    {
-        "field": "params.cloud_exclusion_list",
-      "label": "Cloud Exclusion List",
-      "placeholder": "Pinned, Some Other Category"
-    }]
+    }
+  ]
 }

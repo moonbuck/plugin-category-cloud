@@ -184,23 +184,7 @@
   {{- with site.Params.cloud_class -}}
     {{- $.SetInMap "Params" "Class" . }}
   {{- end -}}
-
-  {{- with site.Params.cloud_exclusion_list -}}
-    
-    {{- /* Split the string with comma as delimiter */ -}}
-    {{- $list := split . "," -}}
-    
-    {{- /* Trim off any whitespace */ -}}
-    {{- $list = apply $list "trim" "." " \t\n" -}}
-    
-    {{- /* Ensure the values are in anchorized form */ -}}
-    {{- $list = apply $list "anchorize" "." -}}
-    
-    {{- /* Store the list */ -}}
-    {{- $.SetInMap "Params" "ExclusionList" $list -}}
-
-  {{- end -}}
-  
+ 
   {{- /* Check whether to build map of menu URLs */ -}}
   {{- if (.Get "Params").MenuItemMatching -}}
   
