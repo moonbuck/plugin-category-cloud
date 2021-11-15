@@ -4,7 +4,7 @@
   justify-content: center;
   align-content: center;
   align-items: baseline;
-  gap: 0px 10px;
+  gap: 10px 10px;
   width: 90%;
   max-width: 900px;
   padding: 0px 20px;
@@ -15,6 +15,7 @@
   color: #666; 
   margin: 0px;
   padding: 0px;
+  line-height: 1;
 }
 
 .category-cloud-link:hover { color: #000; }

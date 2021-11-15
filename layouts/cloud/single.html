@@ -13,6 +13,7 @@
     {{- $scratch.SetInMap "params" "Humanize" true -}}
     {{- $scratch.SetInMap "params" "MenuItemMatching" true -}}
     {{- $scratch.SetInMap "params" "Class" "category-cloud-link" -}}
+    {{- $scratch.SetInMap "params" "DisplayPageCounts" true -}}
     {{- $scratch.SetInMap "params" "ExclusionList" slice -}}
     
     {{- /* Gather menu entries */ -}}
@@ -58,6 +59,10 @@
         {{- $scratch.SetInMap "params" "Class" . -}}
       {{- end -}}
     
+      {{- if (isset . "DisplayPageCounts") -}}
+        {{- $scratch.SetInMap "params" "DisplayPageCounts" .DisplayPageCounts -}}
+      {{- end -}}
+
       {{- with .ExclusionList -}}
         
         {{- /* Ensure the values are in anchorized form */ -}}
@@ -102,7 +107,13 @@
     {{- with site.Params.cloud_class -}}
       {{- $scratch.SetInMap "params" "Class" . }}
     {{- end -}}
-  
+
+    {{- with site.Params.cloud_display_page_counts -}}
+      {{- if (in (slice "true" "false") .) -}}
+        {{- $scratch.SetInMap "params" "DisplayPageCounts" (eq . "true") -}}
+      {{- end -}}
+    {{- end -}}
+    
     {{- with site.Params.cloud_exclusion_list -}}
       
       {{- /* Split the string with comma as delimiter */ -}}
@@ -128,6 +139,7 @@
     {{- $humanize := $params.Humanize -}}
     {{- $menu_item_matching := $params.MenuItemMatching -}}
     {{- $menu_urls := cond $menu_item_matching ($scratch.Get "menu_urls") dict -}}
+    {{- $display_page_counts := $params.DisplayPageCounts -}}
     {{- $exclusion_list := $params.ExclusionList -}}
     {{- $class := $params.Class -}}    
     
@@ -136,52 +148,74 @@
     {{- $names = $names | default site.Data.plugin_category_cloud.display_names -}}
     {{- $names = $names | default dict -}}
     
-    {{- /* Calculate max category page count */}}
-    {{- $max := len (index site.Taxonomies.categories.ByCount 0).Pages }}
+    {{- /* Create a slice to hold a filtered list of categories */ -}}
+    {{- $categories := slice -}}
+    
+    {{- /* Iterate the categories ordered by page count */ -}}
+    {{- range site.Taxonomies.categories.ByCount -}}
+      {{- if not (in $exclusion_list .Name) -}}
+        {{- $categories = $categories | append . -}}
+      {{- end -}}
+    {{- end -}}
+    
+    
+    {{- /* Count the number of categories */ -}}
+    {{- $category_count := len $categories -}}
+
+    {{- /* Calculate the number of weight steps */ -}}
+    {{- $weight_steps := div (sub $max_weight $min_weight) 100 -}}
+    
+    {{- $skip_count := 0 -}}
+    
+    {{- /* Iterate the weight steps */ -}}
+    {{- range $step := (seq $weight_steps 1) -}}
+
+      {{- $consider_count := sub $category_count $skip_count -}}
+      
+      {{- if $consider_count -}}
+        {{- $considered_categories := last $consider_count $categories -}}
+        
+        {{- /* Calculate the average for this step */ -}}
+        {{- $total := 0 -}}
+        {{- range $considered_categories -}}        
+          {{- $total = add $total .WeightedPages.Count -}}
+        {{- end -}}
+      
+        {{- $average := div $total ($consider_count | float) -}}
+        
+        {{- range $considered_categories -}}        
+              
+          {{- if (ge .WeightedPages.Count $average) -}}
+
+            {{- $scratch.SetInMap "steps" (.WeightedPages.Count | string) $step -}}
+            {{- $skip_count = add $skip_count 1 -}}          
+            
+          {{- end -}}
+          
+        {{- end -}}
+                
+      {{- end -}}
+    
+    {{- end -}}
+    
+    {{- $steps := $scratch.Get "steps" -}}
+    
+    {{- $size_increment := div (sub $max_size $min_size) $weight_steps }}
     
     {{- /* Open up the div tag for the cloud */ -}}
     <div id="category-cloud">
     
-    {{- /* Iterate the categories */ -}}
+    {{- /* Iterate the unordered categories */ -}}
     {{- range $anchorized_name, $taxonomy := site.Taxonomies.categories }}
     
     {{- /* Guard against categories in the exclusion list */ -}}
     {{- if not (in $exclusion_list $anchorized_name) -}}
     
-      {{- /* Determine how many pages the category holds */ -}}
-      {{- $count := len $taxonomy.Pages -}}
-      
-      {{- /* Calculate percent of max_count that count represents */ -}}
-      {{- $percent := div ($count | float) $max -}}
-      
-      {{- /* Multiply the max size by the calculated percent */ -}}
-      {{- $size := mul $max_size $percent -}}
-      {{- if (lt $size $min_size) }}{{ $size = $min_size }}{{ end -}}
-      
-      {{- /* Multiply the max weight by the calculated percent */ -}}  
-      {{- $weight := mul $max_weight $percent -}}
-      {{- if (lt $weight $min_weight) }}{{ $weight = $min_weight }}{{ end -}}
-      
-      {{- /* CSS weights increment by 100, check for fractional part */ -}}  
-      {{- with mod $weight 100 -}}
-      
-        {{- /* Get the integer part */ -}}
-        {{- $integer := sub $weight . -}}
-        
-        {{- /* Branch based on whether we're rounding up or down */ -}}
-        {{- if (ge . 50) -}}
-        
-          {{- /* Round up */ -}}
-          {{- $weight = add $integer 100 -}}
-        
-        {{- else -}}
-        
-          {{- /* Round down */ -}}
-          {{- $weight = $integer -}}
-        
-        {{- end -}}{{- /* Close if */ -}}
-        
-      {{- end -}}{{- /* Close if */ -}}
+      {{- /* Calculate the size and weight */ -}}
+      {{- $count := $taxonomy.Count -}}            
+      {{- $step := index $steps ($count | string) -}}    
+      {{- $size := add $min_size (mul $step $size_increment) -}}      
+      {{- $weight := add $min_weight (mul $step 100) -}}
       
       {{- /* Generate the category URL */ -}}
       {{- $href := path.Join ("/categories/" | relLangURL) $anchorized_name }}
@@ -210,7 +244,10 @@
       {{- end -}}
       
       {{- /* Generate the visible text */ -}}
-      {{- $text := printf "%s (%v)" $name $count -}}
+      {{- $text := $name -}}
+      {{- if $display_page_counts -}}
+        {{- $text = printf "%s (%v)" $text $count -}}
+      {{- end -}}
       
       {{- /* Generate the anchor tag for this category */ -}}
       

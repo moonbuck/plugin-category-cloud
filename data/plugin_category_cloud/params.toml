@@ -32,6 +32,11 @@ Humanize = true
 #
 MenuItemMatching = true
 
+# Whether to display parenthesized page counts along
+# with the category names.
+#
+DisplayPageCounts = true
+
 # Class to set on the cloud's category <a> tags.
 #
 Class = 'category-cloud-link'
