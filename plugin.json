@@ -1,9 +1,9 @@
 {
-  "version": "3.0.0",
+  "version": "4.0.0",
   "title": "Moondeer's Category Cloud",
   "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud.",
-  "includes": [
-    "/assets/css/category-cloud.css"
+  "includes": [ 
+    "category-cloud-style.html" 
   ],
   "fields": [
     {
@@ -50,6 +50,5 @@
         "field": "params.cloud_exclusion_list",
       "label": "Cloud Exclusion List",
       "placeholder": "Pinned, Some Other Category"
-    }
-  ]
+    }]
 }
