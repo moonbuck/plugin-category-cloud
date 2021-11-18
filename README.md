@@ -220,16 +220,7 @@ The file living at `content/cloud.md` specifies the front matter for the page.
 title = 'Cloud'
 description = 'A category cloud weighted by posts per category.'
 type = 'cloud'
-  
-[menu.main]
-name = 'Cloud'
-title = 'Cloud'
-identifier = 'cloud'
-url = '/cloud/'
-weight = 110
 +++
 ```
 
-Leave the `type` alone (as that is what points it to `layouts/cloud/single.html`). You can play with the `title` and `description` values. These set the values I would expect your theme to draw from when constructing the page `<head>`. The `menu.main` entry creates a menu item to include the page in your navigation. Leave the `url` alone as it needs to match the value for `type`. You can change the value of `name` to change the text displayed in the navigation link. You can adjust the value of `weight` to slide the menu item up or down your list of navigation items (amongst other weigthed navigaton items). You can remove the `menu` entry entirely if you do not want the page to show up in your navigation menu.
-
-If you really, really want the page URL to be something other than `/cloud/`, it isn’t hard to do. You do, however, need to keep things in sync. Whatever this new value is that is meant to replace *cloud*, it must also be set in the page front matter for `type`, and `url` … **and** … you’ll need to rename `layouts/cloud/single.html` so that *cloud* is replaced by this new value as well.
+Leave the `type` alone (as that is what points it to `layouts/cloud/single.html`). You can play with the `title` and `description` values. These set the values I would expect your theme to draw from when constructing the page `<head>`.
