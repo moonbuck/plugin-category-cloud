@@ -20,6 +20,7 @@
       {{- $menu_urls := .MenuURLs -}}
       {{- $display_names := .Config.DisplayNames -}}
       {{- $humanize := .Config.Humanize -}}
+      {{- $unbreakable := .Config.UnbreakableLinks -}}
       
       {{- range $anchorized_name, $taxonomy := site.Taxonomies.categories }}
       
@@ -52,8 +53,11 @@
           {{- end -}}
               
   <a href="{{ $href | safeURL }}" style="{{ $style | safeCSS }}">
-    {{- $name -}}
-    <span> ({{ $count }})</span>
+  {{- if $unbreakable -}}
+    <nobr>{{ $name }}<span> ({{ $count }})</span></nobr>
+  {{- else -}}
+    {{- $name }}<span> ({{ $count }})</span>
+  {{- end -}}
   </a>
         
         {{- end -}}
