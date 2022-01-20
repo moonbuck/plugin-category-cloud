@@ -1,0 +1,129 @@
+{{- $Calculations := dict -}}
+{{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
+
+  <!-- Create the filtered list of categories -->
+  {{- $categories := where site.Taxonomies.categories.ByCount 
+                          "Name" 
+                          "not in"
+                          .Config.ExclusionList -}}
+  
+  <!-- Count the number of categories -->
+  {{- $category_count := len $categories -}}
+
+  <!-- Calculate the number of weight steps -->
+  {{- $step_count := div (sub .Config.MaxWeight .Config.MinWeight) 100 -}}
+
+  <!-- Calculate the size increment value -->
+  {{- $size_increment := div (sub .Config.MaxSize .Config.MinSize) $step_count }}
+  
+  <!-- Create some empty maps -->
+  {{- $steps := dict -}}
+  {{- $unused_steps := dict -}}
+  
+  <!-- Create a variable to hold the number of processed categories -->
+  {{- $skip_count := 0 -}}
+  
+  <!-- Iterate the weight steps -->
+  {{- range $step := (seq $step_count 1) -}}
+
+    <!-- Calculate the number of categories to consider in this step -->
+    {{- $consider_count := sub $category_count $skip_count -}}
+    
+    <!-- Guard against having processed all availble categories -->
+    {{- if $consider_count -}}
+    
+      <!-- Get the slice of categories being considered -->
+      {{- $considered_categories := last $consider_count $categories -}}
+      
+      <!-- Calculate the total page count for this step's considered categories -->
+      {{- $total := 0 -}}
+      {{- range $considered_categories -}}        
+        {{- $total = add $total .WeightedPages.Count -}}
+      {{- end -}}
+    
+      <!-- Calculate the average for this step's considered categories -->
+      {{- $average := div $total ($consider_count | float) -}}
+      
+      <!-- Iterate the considered categories -->
+      {{- range $considered_categories -}}        
+            
+        <!-- Check whether this category has at least the average page count -->
+        {{- if (ge .WeightedPages.Count $average) -}}
+
+          {{- $steps = merge $steps (dict (.WeightedPages.Count | string) $step) -}}
+          {{- $skip_count = add $skip_count 1 -}}          
+          
+        {{- end -}}
+        
+      {{- end -}} <!-- range $considered_categories -->
+      
+    <!-- Look to assign unused steps -->
+    {{- else -}}      
+    
+      {{- if (ge $step 1) -}}
+      
+        {{- $unused := $step -}}        
+        {{- $assignable_step := 1 -}}
+                
+        <!-- Reset the map of unused steps -->
+        {{- $unused_steps = dict -}}
+        
+        {{- $last_index := sub $category_count 1 -}}
+        
+        {{- range $index := (seq $last_index 0) -}}
+        
+          {{- $category := index $categories $index -}}
+                    
+          {{- if $unused -}}
+            
+            {{- $count := $category.WeightedPages.Count -}}
+            
+            {{- if not (isset $unused_steps ($count | string)) -}}
+            
+              <!-- Check whether overwriting leaves another unused step -->
+              {{- $current_step := index $steps ($count | string) -}}
+              {{- $found_another := false -}}
+                
+              {{- if (gt $index 0) -}}
+              
+                {{- $next_index := sub $index 1 -}}
+                
+                {{- range (seq $next_index 0) -}}
+                
+                  {{- $check_count := (index $categories .).WeightedPages.Count -}}
+                  {{- with (index $steps ($check_count | string)) -}}
+                    {{- $found_another = or $found_another (eq . $current_step) -}}
+                  {{- end -}}
+                
+                {{- end -}}
+              
+              {{- end -}}
+            
+              {{- $unused_steps = merge $unused_steps (dict ($count | string) $assignable_step) -}}  
+              {{- $assignable_step = add $assignable_step 1 -}}
+              {{- if $found_another -}}
+                {{- $unused = sub $unused 1 -}}
+              {{- end -}}
+            
+            {{- end -}}
+          
+          {{- end -}}<!-- if $unused -->
+        
+        {{- end -}}<!-- range $index := (seq $last_index 0) -->
+        
+        {{- $steps = merge $steps $unused_steps -}}
+          
+      {{- end -}}<!-- if (ge $step 1) -->
+      
+    {{- end -}}<!-- if $consider_count -->
+  
+  {{- end -}}<!-- range $step := (seq $step_count 1) -->
+  
+  <!-- Store the calculations in the map -->
+  {{- $Calculations = dict
+    "Steps" $steps
+    "SizeIncrement" $size_increment
+    -}}
+    
+{{- end -}}
+{{- return $Calculations -}}

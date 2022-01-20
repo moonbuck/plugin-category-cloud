@@ -1,18 +1,28 @@
-# Max font size to use in the cloud in rem units.
-#
-MaxSize = 1.34
+# Debug and build related parameters.
+#####################################
 
-# Min font size to use in the cloud in rem units.
+# Theme version, printed to HTML comment when the plugin loads.
 #
-MinSize = 0.9
+Version = '6.0.0'
 
-# Max font weight to use in the cloud.
+# Whether to print HTML comments for debugging purposes.
 #
-MaxWeight = 800
+DebugPrint = false
 
-# Min font weight to use in the cloud.
+# Whether to provide subresource integrity by generating a 
+# base64-encoded cryptographic hash and attaching a .Data.Integrity
+# property containing an integrity string, which is made up of the
+# name of the hash function, one hyphen and the base64-encoded hash sum.
 #
-MinWeigth = 200
+Fingerprint = true
+
+# Output style for /assets/sass/category-cloud.scss. 
+# Valid options are nested, expanded, compact and compressed
+#
+SassOutput = 'compact'
+
+# Configuring the cloud.
+########################
 
 # Category names are fetched in their anchorized form.
 # Setting this parameter to true will convert anchorized
@@ -31,15 +41,6 @@ Humanize = true
 # use the URL value of the menu item.
 #
 MenuItemMatching = true
-
-# Whether to display parenthesized page counts along
-# with the category names.
-#
-DisplayPageCounts = true
-
-# Class to set on the cloud's category <a> tags.
-#
-Class = 'category-cloud-link'
 
 # List of categories to exclude from the category cloud.
 #

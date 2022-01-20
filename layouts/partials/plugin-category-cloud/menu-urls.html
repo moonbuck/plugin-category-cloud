@@ -1,0 +1,10 @@
+{{- $MenuURLs := dict -}}
+
+{{- /* Populate the menu URL map when flagged. */ -}}
+{{- if (.Scratch.Get "plugin-category-cloud.Parameters").Config.MenuItemMatching -}}
+  {{- range site.Menus.main -}}
+    {{- $MenuURLs = merge $MenuURLs (dict (path.Base .URL) .URL) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $MenuURLs -}}

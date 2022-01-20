@@ -2,357 +2,74 @@
 
   {{- if site.Taxonomies.categories -}}
 
-    {{- /* Create a new scratch instance. */ -}}
-    {{- $scratch := newScratch -}}
+    {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
     
-    {{- /* Invoke the parameter parsing template providing scratch */ -}}
-    {{- template "parse-parameters" $scratch -}}
+    {{- $MenuURLs := partial "plugin-category-cloud/menu-urls.html" . -}}  
     
-    {{- /* Invoke the step calculating template providing scratch */ -}}
-    {{- template "calculate-steps" $scratch -}}
+    {{- $Calculations := partial "plugin-category-cloud/calculate-steps.html" . -}}    
+        
+<!-- Open up the div tag for the cloud -->
+<div id="{{ $Parameters.Style.WrapperID }}">
     
-    {{- /* Unpack the parameter values from scratch  */ -}}       
-    {{- with ($scratch.Get "Params") -}}
-    
-{{- /* Open up the div tag for the cloud */ -}}
-<div id="category-cloud">
-    
-      {{- /* Capture parameter values */ -}}
-      {{- $ExclusionList := .ExclusionList -}}
-      {{- $Steps := .Steps -}}
-      {{- $MinSize := .MinSize -}}
-      {{- $MinWeight := .MinWeight -}}
-      {{- $SizeIncrement := .SizeIncrement -}}
-      {{- $MenuURLs := .MenuURLs -}}
-      {{- $DisplayNames := .DisplayNames -}}
-      {{- $Humanize := .Humanize -}}
-      {{- $Class := .Class -}}
-      
-      {{- /* Iterate the unordered categories */ -}}
+      <!-- Iterate the unordered categories -->
       {{- range $anchorized_name, $taxonomy := site.Taxonomies.categories }}
       
-        {{- /* Guard against categories in the exclusion list */ -}}
-        {{- if not (in $ExclusionList $anchorized_name) -}}
+        <!-- Guard against categories in the exclusion list -->
+        {{- if not (in $Parameters.Config.ExclusionList $anchorized_name) -}}
         
-          {{- /* Calculate the size and weight */ -}}
+          <!-- Calculate the size and weight -->
           {{- $count := $taxonomy.Count -}}            
-          {{- $step := index $Steps ($count | string) -}}    
-          {{- $size := add $MinSize (mul $step $SizeIncrement) -}}      
-          {{- $weight := add $MinWeight (mul $step 100) -}}
+          {{- $step := index $Calculations.Steps ($count | string) -}}    
+          {{- $size := add $Parameters.Style.MinSize 
+                       (mul $step $Calculations.SizeIncrement) -}}      
+          {{- $weight := add $Parameters.Style.MinWeight (mul $step 100) -}}
           
-          {{- /* Generate the category URL */ -}}
-          {{- $href := path.Join ("/categories/" | relLangURL) $anchorized_name }}
-          {{- with (index $MenuURLs $anchorized_name) }}{{ $href = . }}{{ end -}}
+          <!-- Generate the category URL -->
+          {{- $href := path.Join ("/categories/" | relLangURL)
+                        $anchorized_name }}
+          {{- with (index $MenuURLs $anchorized_name) -}}
+            {{- $href = . -}}
+          {{- end -}}
           
-          {{- /* Generate the style attribute */ -}}
+          <!-- Generate the style attribute -->
           {{- $style := printf "font-size:%vrem;font-weight:%v" $size $weight -}}
           
-          {{- /* Generate the display name, defaulting to the anchorized form */ -}}
+          <!-- 
+            Generate the display name, 
+            defaulting to the anchorized form 
+            -->
           {{- $name := $anchorized_name -}}
           
-          {{- /* Check for an explicit entry for this category */ -}}
-          {{- with (index $DisplayNames $name) -}}
+          <!-- Check for an explicit entry for this category -->
+          {{- with (index $Parameters.Config.DisplayNames $name) -}}
           
             {{- $name = . -}}
           
-          {{- /* Otherwise, handle humanizing when specified */ -}}
+          <!-- Otherwise, handle humanizing when specified -->
           {{- else -}}
           
-            {{- if $Humanize -}}
+            {{- if $Parameters.Config.Humanize -}}
             
-              {{- $name = delimit (apply (split $name "-") "humanize" ".") " " -}}
+              {{- $name = delimit 
+                (apply (split $name "-") "humanize" ".") " " -}}
             
             {{- end -}}
           
           {{- end -}}
               
-  {{- /* Generate the anchor tag for this category */ -}}      
-  <a href="{{ $href | safeURL }}" 
-     class="{{ $Class }}" 
-     style="{{ $style | safeCSS }}">
-     
+  <!-- Generate the anchor tag for this category -->      
+  <a href="{{ $href | safeURL }}" style="{{ $style | safeCSS }}">     
     {{- $name -}}
-    <span class="category-count"> ({{ $count }})</span>
-    
+    <span> ({{ $count }})</span>    
   </a>
         
-        {{- end -}}{{- /* Close if */ -}}
+        {{- end -}}<!-- Close if -->
         
-      {{- end -}}{{- /* Close range */ -}}
+      {{- end -}}<!-- Close range -->
     
 </div>
     
-    {{- end -}}{{- /* Close with */ -}}
-  
-  {{- end -}}{{- /* Close if */ -}}
 
-{{- end -}}{{- /* Close block */ -}}
+  {{- end -}}<!-- Close if -->
 
-{{- define "parse-parameters" -}}
-
-  {{- /* Insert the default values */ -}}
-  {{- .SetInMap "Params" "MaxSize" 1.34 -}}
-  {{- .SetInMap "Params" "MinSize" 0.9 -}}
-  {{- .SetInMap "Params" "MaxWeight" 800 -}}
-  {{- .SetInMap "Params" "MinWeight" 200 -}}
-  {{- .SetInMap "Params" "Humanize" true -}}
-  {{- .SetInMap "Params" "MenuItemMatching" true -}}
-  {{- .SetInMap "Params" "Class" "category-cloud-link" -}}
-  {{- .SetInMap "Params" "ExclusionList" slice -}}
-  {{- .SetInMap "Params" "DisplayNames" dict -}}
-  
-  {{- /* Resolve the data file */ -}}
-  {{- $data_file := site.Data.plugin_category_cloud_params -}}
-  {{- $data_file = $data_file | default site.Data.plugin_category_cloud.params -}}
-  
-  {{- /* Overwrite defaults with any data file values */ -}}
-  {{- with $data_file -}}
-  
-    {{- with .MaxSize -}}
-      {{- $.SetInMap "Params" "MaxSize" . -}}
-    {{- end -}}
-  
-    {{- with .MinSize }}
-      {{- $.SetInMap "Params" "MinSize" . -}}
-    {{- end -}}
-  
-    {{- with .MaxWeight -}}
-      {{- $.SetInMap "Params" "MaxWeight" . -}}
-    {{- end -}}
-  
-    {{- with .MinWeight -}}
-      {{- $.SetInMap "Params" "MinWeight" . -}}
-    {{- end -}}
-  
-    {{- if (isset . "Humanize") -}}
-      {{- $.SetInMap "Params" "Humanize" .Humanize -}}
-    {{- end -}}
-  
-    {{- if (isset . "MenuItemMatching") -}}
-      {{- $.SetInMap "Params" "MenuItemMatching" .MenuItemMatching -}}
-    {{- end -}}
-
-    {{- with .Class -}}
-      {{- $.SetInMap "Params" "Class" . -}}
-    {{- end -}}
-  
-    {{- with .ExclusionList -}}
-      
-      {{- /* Ensure the values are in anchorized form */ -}}
-      {{- $list := apply . "anchorize" "." -}}
-    
-      {{- /* Store the list */ -}}
-      {{- $.SetInMap "Params" "ExclusionList" $list -}}
-      
-    {{- end -}}
-    
-    {{- with .DisplayNames -}}
-      {{- $.SetInMap "Params" "DisplayNames" . -}}
-    {{- end -}}
-  
-  {{- end -}}{{- /* Close with */ -}}
-  
-  {{- /* Overwrite with any plugin parameter interface values */ -}}
-  {{- with site.Params.cloud_max_rem -}}
-    {{- $.SetInMap "Params" "MaxSize" (. | float) -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_min_rem -}}
-    {{- $.SetInMap "Params" "MinSize" (. | float) -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_max_weight -}}
-    {{- $.SetInMap "Params" "MaxWeight" (. | int) -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_min_weight -}}
-    {{- $.SetInMap "Params" "MinWeight" (. | int) -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_humanize -}}
-    {{- if (in (slice "true" "false") .) -}}
-      {{- $.SetInMap "Params" "Humanize" (eq . "true") -}}
-    {{- end -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_menu_item_matching -}}
-    {{- if (in (slice "true" "false") .) -}}
-      {{- $.SetInMap "Params" "MenuItemMatching" (eq . "true") -}}
-    {{- end -}}
-  {{- end -}}
-
-  {{- with site.Params.cloud_class -}}
-    {{- $.SetInMap "Params" "Class" . }}
-  {{- end -}}
- 
-  {{- /* Check whether to build map of menu URLs */ -}}
-  {{- if (.Get "Params").MenuItemMatching -}}
-  
-    {{- /* Create a scratch for building the URL map */ -}}
-    {{- $url_scratch := newScratch -}}
-  
-    {{- /* Gather menu entries */ -}}
-    {{- range site.Menus.main -}}
-    
-      {{- /* Store menu item URLs keyed by last path component */ -}}
-      {{- $url_scratch.SetInMap "MenuURLs" (path.Base .URL) .URL -}}
-  
-    {{- end -}}
-    
-    {{- /* Insert the constructed map into the provided scratch */ -}}
-    {{- $.SetInMap "Params" "MenuURLs" ($url_scratch.Get "MenuURLs") -}}
-  
-  {{- /* Otherwise, insert and empty map */ -}}
-  {{- else -}}
-  
-    {{- $.SetInMap "Params" "MenuURLs" dict -}}
-  
-  {{- end -}}
-  
-{{- end -}}
-  
-{{- define "calculate-steps" -}}
-
-  {{- /* Create a slice to hold a filtered list of categories */ -}}
-  {{- $categories := slice -}}
-  
-  {{- /* Fetch the current parameter values out of the scratch */ -}}
-  {{- $params := .Get "Params" -}}
-    
-  {{- /* Iterate the categories ordered by page count */ -}}
-  {{- range site.Taxonomies.categories.ByCount -}}
-    {{- if not (in $params.ExclusionList .Name) -}}
-      {{- $categories = $categories | append . -}}
-    {{- end -}}
-  {{- end -}}
-    
-  {{- /* Count the number of categories */ -}}
-  {{- $category_count := len $categories -}}
-
-  {{- /* Calculate the number of weight steps */ -}}
-  {{- $step_count := div (sub $params.MaxWeight $params.MinWeight) 100 -}}
-  
-  {{- /* Create a scratch instance to build the step map */ -}}
-  {{- $step_scratch := newScratch -}}
-  
-  {{- /* Create a variable to hold the number of processed categories */ -}}
-  {{- $skip_count := 0 -}}
-  
-  {{- /* Iterate the weight steps */ -}}
-  {{- range $step := (seq $step_count 1) -}}
-
-    {{- /* Calculate the number of categories to consider in this step */ -}}
-    {{- $consider_count := sub $category_count $skip_count -}}
-    
-    {{- /* Guard against having processed all availble categories */ -}}
-    {{- if $consider_count -}}
-    
-      {{- /* Get the slice of categories being considered */ -}}
-      {{- $considered_categories := last $consider_count $categories -}}
-      
-      {{- /* Calculate the total page count for this step's considered categories */ -}}
-      {{- $total := 0 -}}
-      {{- range $considered_categories -}}        
-        {{- $total = add $total .WeightedPages.Count -}}
-      {{- end -}}
-    
-      {{- /* Calculate the average for this step's considered categories */ -}}
-      {{- $average := div $total ($consider_count | float) -}}
-      
-      {{- /* Iterate the considered categories */ -}}
-      {{- range $considered_categories -}}        
-            
-        {{- /* Check whether this category has at least the average page count */ -}}
-        {{- if (ge .WeightedPages.Count $average) -}}
-
-          {{- /* Assign this category to this step */ -}}
-          {{- $step_scratch.SetInMap "Steps" (.WeightedPages.Count | string) $step -}}
-          
-          {{- /* Increment the number of processed categories */ -}}
-          {{- $skip_count = add $skip_count 1 -}}          
-          
-        {{- end -}}{{- /* Close if */ -}}
-        
-      {{- end -}}{{- /* Close range */ -}}
-      
-    {{- /* Look to assign unused steps */ -}}
-    {{- else -}}      
-    
-      {{- if (ge $step 1) -}}
-      
-        {{- $unused_steps := $step -}}        
-        {{- $assignable_step := 1 -}}
-                          
-        {{- $step_scratch.Set "UnusedSteps" dict -}}
-        
-        {{- $last_index := sub $category_count 1 -}}
-        
-        {{- range $index := (seq $last_index 0) -}}
-        
-          {{- $category := index $categories $index -}}
-                    
-          {{- if $unused_steps -}}
-            
-            {{- $count := $category.WeightedPages.Count -}}
-            
-            {{- if not (isset ($step_scratch.Get "UnusedSteps") ($count | string)) -}}
-            
-              {{- /* Check whether overwriting leaves another unused step */ -}}
-              {{- $current_step := index ($step_scratch.Get "Steps") ($count | string) -}}
-              {{- $found_another := false -}}
-                
-              {{- if (gt $index 0) -}}
-              
-                {{- $next_index := sub $index 1 -}}
-                
-                {{- range (seq $next_index 0) -}}
-                
-                  {{- $check_count := (index $categories .).WeightedPages.Count -}}
-                  {{- with (index ($step_scratch.Get "Steps") ($check_count | string)) -}}
-                    {{- $found_another = or $found_another (eq . $current_step) -}}
-                  {{- end -}}{{- /* Close with */ -}}
-                
-                {{- end -}}{{- /* Close range */ -}}
-              
-              {{- end -}}{{- /* Close if */ -}}
-            
-              {{- $step_scratch.SetInMap "UnusedSteps" ($count | string) $assignable_step -}}  
-              {{- $assignable_step = add $assignable_step 1 -}}
-              {{- if $found_another -}}
-                {{- $unused_steps = sub $unused_steps 1 -}}
-              {{- end -}}
-            
-            {{- end -}}{{- /* Close if */ -}}
-          
-          {{- end -}}{{- /* Close if */ -}}
-        
-        {{- end -}}{{- /* Close range */ -}}
-        
-        {{- $new_assignments := $step_scratch.Get "UnusedSteps" -}}
-        {{- if $new_assignments -}}
-        
-          {{- range $key, $value := $new_assignments -}}
-            
-            {{- $step_scratch.SetInMap "Steps" $key $value -}}
-          
-          {{- end -}}{{- /* Close range */ -}}
-          
-        {{- end -}}{{- /* Close if */ -}}
-        
-      {{- end -}}{{- /* Close if */ -}}
-      
-    {{- end -}}{{- /* Close if */ -}}
-  
-  {{- end -}}{{- /* Close range */ -}}
-  
-  {{- /* Calculate the size increment value */ -}}
-  {{- $size_increment := div (sub $params.MaxSize $params.MinSize) $step_count }}
-
-  {{- /* Store all the calculations in the scratch instance provided */ -}}
-  {{- .SetInMap "Params" "Categories" $categories -}}
-  {{- .SetInMap "Params" "CategoryCount" $category_count -}}
-  {{- .SetInMap "Params" "StepCount" $step_count -}}
-  {{- .SetInMap "Params" "Steps" ($step_scratch.Get "Steps") -}}
-  {{- .SetInMap "Params" "SizeIncrement" $size_increment -}}  
-  
-{{- end -}}  
+{{- end -}}<!-- Close block -->
