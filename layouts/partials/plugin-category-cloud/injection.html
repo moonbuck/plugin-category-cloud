@@ -1,5 +1,4 @@
-{{- /* Resolve the plugin parameter values. */ -}}
-{{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
+{{- /*if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
 {{- partial "plugin-category-cloud/load-parameters.html" . -}}
 {{- end -}}
 
@@ -12,7 +11,6 @@
       {{- printf "\n<!--\nplugin-category-cloud.Parameters:\n%s\n-->" (jsonify .) | safeHTML -}}
     {{- end -}}
   
-    {{- /* Insert the plugin version and build time */ -}}
     {{- $time := (time (sub now.Unix 28800)).Format "Jan 2 at 15:04" -}}
     {{- $version := .Config.Version -}}
     {{ printf "\n<!-- Category Cloud v%s (built on %s) -->\n" $version $time | safeHTML }}
@@ -34,4 +32,4 @@
   
   {{- end -}}
 
-{{ end -}}
+{{ end*/ -}}

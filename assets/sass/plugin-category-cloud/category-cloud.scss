@@ -1,27 +1,27 @@
-@import "vendor/rfs";
+//@import "vendor/rfs";
 
-{{/* Template for injecting rfs include directives into a Sass block. */}}
-{{ define "rfs-wrap" }}
+// Template for injecting rfs include directives into a Sass block.
+{{/* define "rfs-wrap" }}
 
-  {{/* Generate a slice with all the property names. */}}
-  {{ $edges := slice "top" "right" "bottom" "left" }}  
+  //Generate a slice with all the property names.
+  {{ $edges := slice "top" "right" "bottom" "left" }}
   {{ $properties := 
     slice "font-size" "padding" "margin"
     | append (apply $edges "printf" "padding-%s" ".") 
     | append (apply $edges "printf" "margin-%s" ".") }}
 
-  {{/* Convert the slice for use within the regular expression. */}}
+  //Convert the slice for use within the regular expression.
   {{ $properties = delimit $properties "|" }}
   
-  {{/* Create the regular expression */}}
+  // Create the regular expression
   {{ $pattern := printf `(%s):\w*([^;]+)` $properties }}
   
-  {{/* Replace matches with the appropriate rfs include. */}}
+  // Replace matches with the appropriate rfs include.
   {{ replaceRE $pattern `@include $1($2)` . }}
   
-{{ end }}
+{{ end */}}
 
-{{ with (.Scratch.Get "plugin-conversation.Parameters").Style }}
+{{/* with (.Scratch.Get "plugin-conversation.Parameters").Style }}
 
 #{{ .WrapperID }} { 
   display: flex;
@@ -43,4 +43,4 @@
   
 }
 
-{{ end }}
+{{ end */}}

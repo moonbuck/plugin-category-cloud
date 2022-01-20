@@ -2,21 +2,16 @@
 
   {{- if site.Taxonomies.categories -}}
 
-    <!-- Invoke the parameter parsing template providing scratch -->
     {{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
       {{- partial "plugin-category-cloud/load-parameters.html" . -}}
     {{- end -}}
       
-    <!-- Invoke the step calculating template providing scratch -->
     {{- partial "plugin-category-cloud/calculate-steps" . -}}
     
-    <!-- Unpack the parameter values from scratch  -->       
     {{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
     
-<!-- Open up the div tag for the cloud -->
 <div id="{{ .Style.WrapperID }}">
     
-      <!-- Capture parameter values -->
       {{- $exclusions := .Config.ExclusionList -}}
       {{- $steps := .Calculations.Steps -}}
       {{- $min_size := .Style.MinSize | float -}}
@@ -25,36 +20,27 @@
       {{- $menu_urls := .MenuURLs -}}
       {{- $display_names := .Config.DisplayNames -}}
       {{- $humanize := .Config.Humanize -}}
-      {{- $unbreakable := .Config.UnbreakableLinks -}}
       
-      <!-- Iterate the unordered categories -->
       {{- range $anchorized_name, $taxonomy := site.Taxonomies.categories }}
       
-        <!-- Guard against categories in the exclusion list -->
         {{- if not (in $exclusions $anchorized_name) -}}
         
-          <!-- Calculate the size and weight -->
           {{- $count := $taxonomy.Count -}}            
           {{- $step := index $steps ($count | string) -}}    
           {{- $size := add $min_size (mul $step $increment) -}}      
           {{- $weight := add $min_weight (mul $step 100) -}}
           
-          <!-- Generate the category URL -->
           {{- $href := path.Join ("/categories/" | relLangURL) $anchorized_name }}
           {{- with (index $menu_urls $anchorized_name) }}{{ $href = . }}{{ end -}}
           
-          <!-- Generate the style attribute -->
           {{- $style := printf "font-size:%vrem;font-weight:%v" $size $weight -}}
           
-          {{- /* Generate the display name, defaulting to the anchorized form */ -}}
           {{- $name := $anchorized_name -}}
           
-          <!-- Check for an explicit entry for this category -->
           {{- with (index $display_names $name) -}}
           
             {{- $name = . -}}
           
-          {{- /* Otherwise, handle humanizing when specified */ -}}
           {{- else -}}
           
             {{- if $humanize -}}
@@ -65,22 +51,19 @@
           
           {{- end -}}
               
-  <!-- Generate the anchor tag for this category -->      
   <a href="{{ $href | safeURL }}" style="{{ $style | safeCSS }}">
-    {{- if $unbreakable }}<nobr>{{ end -}}
     {{- $name -}}
     <span> ({{ $count }})</span>
-    {{- if $unbreakable }}</nobr>{{ end -}}
   </a>
         
-        {{- end -}}<!-- Close if -->
+        {{- end -}}
         
-      {{- end -}}<!-- Close range -->
+      {{- end -}}
     
 </div>
     
-    {{- end -}}<!-- Close with -->
+    {{- end -}}
   
-  {{- end -}}<!-- Close if -->
+  {{- end -}}
 
-{{- end -}}<!-- Close block -->
+{{- end -}}
