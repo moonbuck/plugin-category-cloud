@@ -67,5 +67,6 @@
 {{- /********************************************
   Insert the parameter map into the page scratch.
   ***********************************************/ -}}
-
 {{- .Scratch.Set "plugin-category-cloud.Parameters" $Parameters -}}
+
+{{- partial "plugin-category-cloud/calculate-steps.html" . -}}

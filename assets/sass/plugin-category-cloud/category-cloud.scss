@@ -1,7 +1,7 @@
-//@import "vendor/rfs";
+@import "vendor/rfs";
 
 // Template for injecting rfs include directives into a Sass block.
-{{/* define "rfs-wrap" }}
+{{ define "rfs-wrap" }}
 
   //Generate a slice with all the property names.
   {{ $edges := slice "top" "right" "bottom" "left" }}
@@ -19,28 +19,37 @@
   // Replace matches with the appropriate rfs include.
   {{ replaceRE $pattern `@include $1($2)` . }}
   
-{{ end */}}
+{{ end }}
 
-{{/* with (.Scratch.Get "plugin-conversation.Parameters").Style }}
+{{ with (.Scratch.Get "plugin-category-cloud.Parameters") }}
 
-#{{ .WrapperID }} { 
+#{{ .Style.WrapperID }} { 
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
   align-items: baseline;
   
-  {{ with .Wrapper }}{{ template "rfs-wrap" . }}{{ end }}
+  {{ with .Style.Wrapper }}{{ template "rfs-wrap" . }}{{ end }}
   
   a { 
-    {{ with .Link }}{{ template "rfs-wrap" . }}{{ end }}
+    {{ with .Style.Link }}{{ template "rfs-wrap" . }}{{ end }}
     
     span {
-      display: {{ cond .DisplayPageCounts "initial" "none" }};
+      display: {{ cond .Style.DisplayPageCounts "initial" "none" }};
+    }
+    
+    @for $i from 1 through {{ .Calculations.StepCount }} {
+      
+      &.step-#{$i} {
+        font-size: ({{ .Style.MinSize }} + $i * {{ .Calculations.SizeIncrement}})rem;
+        font-weight: {{ .Style.MinWeight }} + $i * 100;
+      }
+      
     }
     
   }
   
 }
 
-{{ end */}}
+{{ end }}

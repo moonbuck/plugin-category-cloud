@@ -1,8 +1,10 @@
-{{- $categories := slice -}}
-
-
 {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
   
+{{- $categories := where 
+  site.Taxonomies.categories.ByCount
+  "Name"
+  "not in"
+  $Parameters.Config.ExclusionList -}}
 
 {{- range site.Taxonomies.categories.ByCount -}}
   {{- if not (in $Parameters.Config.ExclusionList .Name) -}}
@@ -10,51 +12,32 @@
   {{- end -}}
 {{- end -}}
   
-
 {{- $category_count := len $categories -}}
-
-
 {{- $step_count := div (sub $Parameters.Style.MaxWeight $Parameters.Style.MinWeight) 100 -}}
-
-
 {{- $scratch := newScratch -}}
-
-
 {{- $skip_count := 0 -}}
-
 
 {{- range $step := (seq $step_count 1) -}}
 
-
   {{- $consider_count := sub $category_count $skip_count -}}
   
-
   {{- if $consider_count -}}
-  
 
     {{- $considered_categories := last $consider_count $categories -}}
     
-
     {{- $total := 0 -}}
     {{- range $considered_categories -}}        
       {{- $total = add $total .WeightedPages.Count -}}
     {{- end -}}
-  
 
     {{- $average := div $total ($consider_count | float) -}}
     
-
     {{- range $considered_categories -}}        
           
 
       {{- if (ge .WeightedPages.Count $average) -}}
-
-
-        {{- $scratch.SetInMap "Steps" (.WeightedPages.Count | string) $step -}}
-        
-
-        {{- $skip_count = add $skip_count 1 -}}          
-        
+        {{- $scratch.SetInMap "Steps" (.WeightedPages.Count | string) $step -}}       
+        {{- $skip_count = add $skip_count 1 -}}       
       {{- end -}}
       
     {{- end -}}

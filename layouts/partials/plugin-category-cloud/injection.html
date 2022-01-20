@@ -1,11 +1,10 @@
-{{- /*if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
+{{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
 {{- partial "plugin-category-cloud/load-parameters.html" . -}}
 {{- end -}}
 
 {{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
 
-  {{- $ID := printf "#%s" .Style.WrapperID -}}
-  {{- if (findRE $ID $.Content) -}}
+  {{- if (findRE .Style.WrapperID $.Content) -}}
 
     {{- if .Config.DebugPrint -}}
       {{- printf "\n<!--\nplugin-category-cloud.Parameters:\n%s\n-->" (jsonify .) | safeHTML -}}
@@ -32,4 +31,4 @@
   
   {{- end -}}
 
-{{ end*/ -}}
+{{ end -}}

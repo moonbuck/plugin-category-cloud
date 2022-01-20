@@ -5,18 +5,13 @@
     {{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
       {{- partial "plugin-category-cloud/load-parameters.html" . -}}
     {{- end -}}
-      
-    {{- partial "plugin-category-cloud/calculate-steps" . -}}
-    
+
     {{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
     
 <div id="{{ .Style.WrapperID }}">
     
       {{- $exclusions := .Config.ExclusionList -}}
       {{- $steps := .Calculations.Steps -}}
-      {{- $min_size := .Style.MinSize | float -}}
-      {{- $min_weight := .Style.MinWeight | float -}}
-      {{- $increment := .Calculations.SizeIncrement -}}
       {{- $menu_urls := .MenuURLs -}}
       {{- $display_names := .Config.DisplayNames -}}
       {{- $humanize := .Config.Humanize -}}
@@ -28,46 +23,28 @@
         
           {{- $count := $taxonomy.Count -}}            
           {{- $step := index $steps ($count | string) -}}    
-          {{- $size := add $min_size (mul $step $increment) -}}      
-          {{- $weight := add $min_weight (mul $step 100) -}}
           
           {{- $href := path.Join ("/categories/" | relLangURL) $anchorized_name }}
           {{- with (index $menu_urls $anchorized_name) }}{{ $href = . }}{{ end -}}
-          
-          {{- $style := printf "font-size:%vrem;font-weight:%v" $size $weight -}}
-          
-          {{- $name := $anchorized_name -}}
-          
-          {{- with (index $display_names $name) -}}
-          
-            {{- $name = . -}}
-          
+                    
+          {{- $name := $anchorized_name -}}      
+          {{- with (index $display_names $name) }}          
+            {{- $name = . -}}          
           {{- else -}}
-          
-            {{- if $humanize -}}
-            
-              {{- $name = delimit (apply (split $name "-") "humanize" ".") " " -}}
-            
-            {{- end -}}
-          
+            {{- if $humanize -}}            
+              {{- $name = delimit (apply (split $name "-") "humanize" ".") " " -}}           
+            {{- end -}} 
           {{- end -}}
               
-  <a href="{{ $href | safeURL }}" style="{{ $style | safeCSS }}">
-  {{- if $unbreakable -}}
-    <nobr>{{ $name }}<span> ({{ $count }})</span></nobr>
-  {{- else -}}
+  <a href="{{ $href | safeURL }}" class="step-{{ $step }}">
     {{- $name }}<span> ({{ $count }})</span>
-  {{- end -}}
   </a>
         
-        {{- end -}}
-        
+        {{- end -}}        
       {{- end -}}
     
 </div>
     
     {{- end -}}
-  
   {{- end -}}
-
 {{- end -}}
