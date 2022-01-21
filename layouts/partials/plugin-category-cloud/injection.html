@@ -4,7 +4,7 @@
 
 {{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
 
-  {{- if (findRE .Style.WrapperID $.Content) -}}
+  {{- if (eq $.Content "plugin-category-cloud") -}}
 
     {{- if .Config.DebugPrint -}}
       {{- printf "\n<!--\nplugin-category-cloud.Parameters:\n%s\n-->" (jsonify .) | safeHTML -}}
