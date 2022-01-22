@@ -7,23 +7,11 @@ WrapperID = 'category-cloud'
 
 # Sass block to apply to the wrapper.
 #
-Wrapper = '''
-gap: 10px;
-width: 90%;
-max-width: 900px;
-padding: 0px 20px;
-margin: 40px auto; 
-'''
+Wrapper = ''
 
 # Sass block to apply to links.
 #
-Link = '''
-color: #666; 
-margin: 0px;
-padding: 0px;
-line-height: 1;
-&:hover { color: #000; }
-'''
+Link = ''
 
 # Max font size to use in the cloud in rem units.
 #
