@@ -47,6 +47,7 @@
 {{- $Parameters = merge $Parameters . -}}
 {{- end -}}
 
+{{/* Generate the map of menu URLs */}}
 {{- $MenuURLs := dict -}}
   
 {{- /* Check whether to build map of menu URLs */ -}}
@@ -62,11 +63,29 @@
   
 {{- end -}}
 
-{{- $Parameters = merge $Parameters (dict "MenuURLs" $MenuURLs) -}}
+{{- $Parameters = merge $Parameters 
+                        (dict "MenuURLs" $MenuURLs) -}}
+
+{{/* Calculate the total number of steps by using
+     the spread between min and max font weights */}}
+{{- $total_steps := (div 
+                      (sub $Parameters.Style.MaxWeight 
+                           $Parameters.Style.MinWeight) 
+                           100) -}}
+                           
+{{- $size_increment :=  div (sub $Parameters.Style.MaxSize 
+                                 $Parameters.Style.MinSize) 
+                            $total_steps -}}
+
+{{- $calculations := dict
+  (slice "Style" "TotalSteps") $total_steps
+  (slice "Style" "SizeIncrement") $size_increment 
+  -}}
+
+{{- $Parameters = merge $Parameters $calculations -}}
+                           
 
 {{- /********************************************
   Insert the parameter map into the page scratch.
   ***********************************************/ -}}
 {{- .Scratch.Set "plugin-category-cloud.Parameters" $Parameters -}}
-
-{{- partial "plugin-category-cloud/calculate-steps.html" . -}}

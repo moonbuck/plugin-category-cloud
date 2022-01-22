@@ -23,8 +23,6 @@
 
 {{ with (.Scratch.Get "plugin-category-cloud.Parameters") }}
 
-$step-count: {{ div (sub .Style.MaxWeight .Style.MinWeight) 100 }};
-$size-increment: {{ sub .Style.MaxSize .Style.MinSize }} / $step-count;
 
 #{{ .Style.WrapperID }} { 
   display: flex;
@@ -42,10 +40,10 @@ $size-increment: {{ sub .Style.MaxSize .Style.MinSize }} / $step-count;
       display: {{ cond .Style.DisplayPageCounts "initial" "none" }};
     }
     
-    @for $i from 1 through $step-count {
+    @for $i from 1 through {{ .Style.TotalSteps }} {
       
       &.step-#{$i} {
-        font-size: ({{ .Style.MinSize }} + $i * $size-increment)rem;
+        @include font-size(({{ .Style.MinSize }} + $i * {{ .Style.SizeIncrement }})rem);
         font-weight: {{ .Style.MinWeight }} + $i * 100;
       }
       

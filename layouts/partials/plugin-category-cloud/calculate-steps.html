@@ -1,132 +1,132 @@
+{{/* Fetch the plugin parameters */}}
 {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
-  
-{{- $categories := where 
-  site.Taxonomies.categories.ByCount
-  "Name"
-  "not in"
-  $Parameters.Config.ExclusionList -}}
 
-{{- range site.Taxonomies.categories.ByCount -}}
-  {{- if not (in $Parameters.Config.ExclusionList .Name) -}}
-    {{- $categories = $categories | append . -}}
-  {{- end -}}
-{{- end -}}
+{{/* Fetch the categories to include */}}
+{{- $categories := where site.Taxonomies.categories.ByCount
+                         "Name"
+                         "not in"
+                         $Parameters.Config.ExclusionList -}}
   
-{{- $category_count := len $categories -}}
-{{- $step_count := div (sub $Parameters.Style.MaxWeight $Parameters.Style.MinWeight) 100 -}}
+{{/* Create a local scratch for intermediate calculations */}}
 {{- $scratch := newScratch -}}
-{{- $skip_count := 0 -}}
 
-{{- range $step := (seq $step_count 1) -}}
+{{/* Create a map to hold the step assignments */}}
+{{- $Steps := dict -}}
 
-  {{- $consider_count := sub $category_count $skip_count -}}
+{{/* Track the number of categories to skip */}}
+{{- $skip := 0 -}}
+
+{{/* Iterate the steps from highest (lightest) to lowest (boldest) */}}
+{{- range $step := (seq $Parameters.Style.TotalSteps 1) -}}
+
+  {{/* calculate the number of categories to consider for this step */}}
+  {{- $consider := sub (len $categories) $skip -}}
   
-  {{- if $consider_count -}}
+  {{/* Check whether categories remain to consider */}}
+  {{- if $consider -}}
 
-    {{- $considered_categories := last $consider_count $categories -}}
+    {{/* Grab the considered categories from the tail end of the slice */}}
+    {{- $considered := last $consider $categories -}}
     
+    {{/* Sum the page counts of the considered categories */}}
     {{- $total := 0 -}}
-    {{- range $considered_categories -}}        
+    {{- range $considered -}}        
       {{- $total = add $total .WeightedPages.Count -}}
     {{- end -}}
 
-    {{- $average := div $total ($consider_count | float) -}}
+    {{/* Calculate the average page count of the considered categories */}}
+    {{- $average := div $total ($consider | float) -}}
     
-    {{- range $considered_categories -}}        
-          
+    {{/* Iterate the considered categories for this step */}}
+    {{- range $considered -}}        
 
+      {{/* Check whether the considered category has a page count 
+           that is greater than or equal to the calculated average */}}
       {{- if (ge .WeightedPages.Count $average) -}}
-        {{- $scratch.SetInMap "Steps" (.WeightedPages.Count | string) $step -}}       
-        {{- $skip_count = add $skip_count 1 -}}       
+      
+        {{/* Assign this step to this category's page count */}}
+        {{- $Steps = merge $Steps (dict (.WeightedPages.Count | string) $step) -}}
+
+        {{/* Increment the skipped category counter */}}
+        {{- $skip = add $skip 1 -}}   
+        
       {{- end -}}
       
     {{- end -}}
     
-
-  {{- else -}}      
-  
-    {{- if (ge $step 1) -}}
+  {{/* Otherwise adjust for unassigned steps */}}
+  {{- else  if (ge $step 1) -}}
     
-      {{- $unused_steps := $step -}}        
-      {{- $assignable_step := 1 -}}
-                        
-      {{- $scratch.Set "UnusedSteps" dict -}}
-      
-      {{- $last_index := sub $category_count 1 -}}
-      
-      {{- range $index := (seq $last_index 0) -}}
-      
-        {{- $category := index $categories $index -}}
-                  
-        {{- if $unused_steps -}}
-          
-          {{- $count := $category.WeightedPages.Count -}}
-          
-          {{- if not (isset ($scratch.Get "UnusedSteps") ($count | string)) -}}
-          
+    {{/* Track the highest unused step */}}
+    {{- $unused := $step -}}
+    
+    {{/* Track the currently assignable step */}}
+    {{- $assignable := 1 -}}
 
-            {{- $current_step := index ($scratch.Get "Steps") ($count | string) -}}
-            {{- $found_another := false -}}
-              
-            {{- if (gt $index 0) -}}
+    {{/* Create a map for unused step assignments */}}
+    {{- $UnusedSteps := dict -}}
+    
+    {{/* Iterate category indices in reverse order */}}
+    {{- range $index := (seq (sub (len $categories) 1) 0) -}}
+    
+      {{/* Grab the category at this index. */}}
+      {{- $category := index $categories $index -}}
+
+      {{/* Check whether unused steps remain */}}
+      {{- if $unused -}}
+        
+        {{/* Grab the page count for this category */}}
+        {{- $count := $category.WeightedPages.Count -}}
+        
+        {{/* Check whether an unused step has been assigned for this count */}}
+        {{- if not (isset $UnusedSteps ($count | string)) -}}
+
+          {{/* Fetch the step previously assigned for this count */}}
+          {{- $current_step := index $Steps ($count | string) -}}
+          
+          {{/* Create a flag to track whether ??? */}}
+          {{- $found_another := false -}}
             
-              {{- $next_index := sub $index 1 -}}
+          {{/* Only proceed if we aren't at the head of the slice */}}
+          {{- if (gt $index 0) -}}
+          
+            {{/* Iterate the indices ahead of the current index */}}
+            {{- range (seq (sub $index 1) 0) -}}
+            
+              {{/* Fetch the previously assigned step for the current index */}}
+              {{- with (index $Steps 
+                              ((index $categories .).WeightedPages.Count | string)) -}}
               
-              {{- range (seq $next_index 0) -}}
-              
-                {{- $check_count := (index $categories .).WeightedPages.Count -}}
-                {{- with (index ($scratch.Get "Steps") ($check_count | string)) -}}
-                  {{- $found_another = or $found_another (eq . $current_step) -}}
-                {{- end -}}
-              
+                {{/* Set the found another flag according to whether this
+                     or a previous iteration's previously assigned step matches */}}
+                {{- $found_another = or $found_another (eq . $current_step) -}}
+                
               {{- end -}}
             
             {{- end -}}
           
-            {{- $scratch.SetInMap "UnusedSteps" ($count | string) $assignable_step -}}  
-            {{- $assignable_step = add $assignable_step 1 -}}
-            {{- if $found_another -}}
-              {{- $unused_steps = sub $unused_steps 1 -}}
-            {{- end -}}
-          
           {{- end -}}
         
-        {{- end -}}
-      
-      {{- end -}}
-      
-      {{- $new_assignments := $scratch.Get "UnusedSteps" -}}
-      {{- if $new_assignments -}}
-      
-        {{- range $key, $value := $new_assignments -}}
+          {{/* Add an entry assigning the assignable step for this page count */}}
+          {{- $UnusedSteps = merge $UnusedSteps (dict ($count | string) $assignable) -}}
           
-          {{- $scratch.SetInMap "Steps" $key $value -}}
+          {{/* Increment the assignable step */}}
+          {{- $assignable = add $assignable 1 -}}
+          
+          {{/* Honestly, kinda forgot how this algorithm works */}}
+          {{- if $found_another }}{{ $unused = sub $unused 1 }}{{ end -}}
         
         {{- end -}}
-        
-      {{- end -}}
       
-    {{- end -}}
+      {{- end -}}
     
-  {{- end -}}
+    {{- end -}} {{/* if not (isset $UnusedSteps ($count | string)) */}}
+    
+    {{/* Merge new assignments into the step map */}}
+    {{- $Steps = merge $Steps $UnusedSteps -}}
+          
+  {{- end -}} {{/* if $consider */}}
 
-{{- end -}}
+{{- end -}} {{/* range $step := (seq $total_steps 1) */}}
 
-{{- $MinSize := $Parameters.Style.MinSize | float -}}
-{{- $MaxSize := $Parameters.Style.MaxSize | float -}}
-{{- $SizeSpread := sub $MaxSize $MinSize -}}
-
-
-{{- $size_increment := div $SizeSpread $step_count }}
-
-{{- $Calculations := dict
-  "Categories" $categories
-  "CategoryCount" $category_count
-  "StepCount" $step_count
-  "Steps" ($scratch.Get "Steps")
-  "SizeIncrement" $size_increment
-  -}}
-
-{{- $Parameters = merge $Parameters (dict "Calculations" $Calculations) -}}
-
-{{- .Scratch.Set "plugin-category-cloud.Parameters" $Parameters -}}
+{{- return $Steps -}}
