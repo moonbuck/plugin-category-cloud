@@ -9,4 +9,4 @@ identifier = 'cloud'
 url = '/cloud/'
 weight = 110
 +++
-{{< category-cloud >}}
+{{< plugin-category-cloud >}}
