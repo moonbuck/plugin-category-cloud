@@ -9,7 +9,7 @@
   {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
   
   {{/* Calculate the step assignments */}}
-  {{- $Steps := partial "plugin-category-cloud/calculate-steps.html" . -}}
+  {{- $Steps := partial "plugin-category-cloud/assign-steps.html" . -}}
 
 {{/* Open up the wrapper. */}}
 <div id="{{ $Parameters.Style.WrapperID }}">

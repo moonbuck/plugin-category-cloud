@@ -84,6 +84,12 @@
 
 {{- $Parameters = merge $Parameters $calculations -}}
                            
+{{- /* Normalize cateegory names in exclusion list. */ -}}
+{{- $normalized := slice -}}
+{{- range $Parameters.Config.ExclusionList -}}
+  {{- $normalized = $normalized | append (. | anchorize | lower) -}}
+{{- end -}}
+{{- $Parameters = merge $Parameters (dict (slice "Config" "ExclusionList") $normalized) -}}
 
 {{- /********************************************
   Insert the parameter map into the page scratch.

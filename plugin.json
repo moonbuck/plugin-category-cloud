@@ -1,5 +1,5 @@
 {
-  "version": "6.0.8",
+  "version": "6.0.9",
   "title": "Moondeer's Category Cloud",
   "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud.",
   "includes": [ "plugin-category-cloud/injection.html" ]
