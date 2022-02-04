@@ -84,7 +84,7 @@
 
 {{- $Parameters = merge $Parameters $calculations -}}
                            
-{{- /* Normalize cateegory names in exclusion list. */ -}}
+{{- /* Normalize category names in exclusion list. */ -}}
 {{- $normalized := slice -}}
 {{- range $Parameters.Config.ExclusionList -}}
   {{- $normalized = $normalized | append (. | anchorize | lower) -}}

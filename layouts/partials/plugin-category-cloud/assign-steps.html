@@ -2,14 +2,13 @@
 {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
 
 {{/* Fetch the categories to include */}}
-{{- $categories := where site.Taxonomies.categories.ByCount
-                         "Name"
-                         "not in"
-                         $Parameters.Config.ExclusionList -}}
+{{- $categories := slice -}}
+{{- range $name, $category := site.Taxonomies.categories.ByCount -}}
+  {{- if not (in $Parameters.Config.ExclusionList $name) -}}
+    {{- $categories = $categories | append $category -}}
+  {{- end -}}
+{{- end -}}
   
-{{/* Create a local scratch for intermediate calculations */}}
-{{- $scratch := newScratch -}}
-
 {{/* Create a map to hold the step assignments */}}
 {{- $Steps := dict -}}
 

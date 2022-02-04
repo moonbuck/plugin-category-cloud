@@ -16,9 +16,8 @@
     
   {{/* Iterate over the non-excluded categories. */}}
   {{- range $name, 
-            $taxonomy := (where site.Taxonomies.categories
-                         "Name" "not in" $Parameters.Config.ExclusionList) }}
-
+            $taxonomy := site.Taxonomies.categories -}}
+    {{- if not (in $Parameters.Config.ExclusionList $name) -}}
     {{/* Fetch the assigned step. */}}
     {{- $step := index $Steps ($taxonomy.Count | string) -}}    
     
@@ -46,6 +45,7 @@
     {{- if $Parameters.Config.UnbreakableLinks }}</nobr>{{ end -}}
   </a> 
   
+  {{- end -}}
   {{- end -}} {{/* range $anchorized_name… */}}
 
 {{/* Close the wrapper. */}}
