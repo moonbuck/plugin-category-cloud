@@ -3,7 +3,7 @@
 
 # Theme version, printed to HTML comment when the plugin loads.
 #
-Version = '6.0.10'
+Version = '6.0.11'
 
 # Whether to print HTML comments for debugging purposes.
 #
@@ -20,3 +20,18 @@ Fingerprint = true
 # Valid options are nested, expanded, compact and compressed
 #
 SassOutput = 'compact'
+
+# The relative paths of pages that should link to the stylesheet.
+# Leave the array empty to always link to the stylesheet. The stylesheet
+# is always linked for the page generated at /cloud/. If you want to 
+# remove the generated page from the menu and/or insert the cloud elsewhere
+# you can enter the relative page path(s) here to ensure the stylesheet 
+# is linked for pages wherein you've inserted an invocation of the partial
+# (i.e. {{ partial "plugin-category-cloud/category-cloud.html" . }}).
+# 
+# For example, the relative path of the home page would be '/'. The
+# relative path for a page like https://my.blog/archive/ would be '/archive/'.
+# The relative path for a page like https://my.blog/some/random/page.html would
+# be '/some/random/page.html'
+#
+PagePaths = []

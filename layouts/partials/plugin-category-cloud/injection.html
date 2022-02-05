@@ -1,10 +1,12 @@
-{{ if .HasShortcode "plugin-category-cloud" -}}
+{{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
+{{- partial "plugin-category-cloud/load-parameters.html" . -}}
+{{- end -}}
+
+{{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
   
-  {{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
-  {{- partial "plugin-category-cloud/load-parameters.html" . -}}
-  {{- end -}}
-  
-  {{- with (.Scratch.Get "plugin-category-cloud.Parameters") -}}
+  {{ if (or ($.HasShortcode "plugin-category-cloud")
+            (or (not .Config.PagePaths) 
+                (in .Config.PagePaths $.RelPermalink))) -}}
   
     {{- if .Config.DebugPrint -}}
       {{- printf "\n<!--\nplugin-category-cloud.Parameters:\n%s\n-->" (. | jsonify (dict "prefix" " " "indent" "  ")) | safeHTML -}}
