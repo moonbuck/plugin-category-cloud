@@ -1,6 +1,6 @@
 {
-  "version": "6.0.9",
+  "version": "6.0.10",
   "title": "Moondeer's Category Cloud",
-  "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud. An updated README is on the way. See the documented configuration files in the plugin's data directory for plugin parameters and feel free to holler at me with any questions.",
+  "description": "Another category cloud plugin, inspired by https://github.com/chtny/plugin-category-cloud. Details on configuring plugin parameters may be found <a href='https://moondeer.blog/2022/02/05/plugincategorycloud-a-readme.html'>here</a>",
   "includes": [ "plugin-category-cloud/injection.html" ]
 }
