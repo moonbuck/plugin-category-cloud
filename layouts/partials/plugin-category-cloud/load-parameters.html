@@ -13,9 +13,9 @@
     "Version" ""
     "DebugPrint" false
     "Fingerprint" true
-    "SassOutput" "compact"
+    "SassOutput" "compact")
+  "Names" (dict
     "Humanize" true
-    "UnbreakableLinks" true
     "MenuItemMatching" true
     "ExclusionList" (slice)
     "DisplayNames" (dict))
@@ -27,7 +27,8 @@
     "MinSize" 0.9
     "MaxWeight" 800
     "MinWeight" 200
-    "DisplayPageCounts" true)
+    "DisplayPageCounts" false
+    "UnbreakableLinks" true)
   -}}
 
 {{- /************************************************
@@ -51,7 +52,7 @@
 {{- $MenuURLs := dict -}}
   
 {{- /* Check whether to build map of menu URLs */ -}}
-{{- if $Parameters.Config.MenuItemMatching -}}
+{{- if $Parameters.Names.MenuItemMatching -}}
 
   {{- $scratch := newScratch -}}
   
@@ -86,10 +87,10 @@
                            
 {{- /* Normalize category names in exclusion list. */ -}}
 {{- $normalized := slice -}}
-{{- range $Parameters.Config.ExclusionList -}}
+{{- range $Parameters.Names.ExclusionList -}}
   {{- $normalized = $normalized | append (. | anchorize | lower) -}}
 {{- end -}}
-{{- $Parameters = merge $Parameters (dict (slice "Config" "ExclusionList") $normalized) -}}
+{{- $Parameters = merge $Parameters (dict (slice "Names" "ExclusionList") $normalized) -}}
 
 {{- /********************************************
   Insert the parameter map into the page scratch.

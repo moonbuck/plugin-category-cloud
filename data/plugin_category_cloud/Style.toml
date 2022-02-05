@@ -5,11 +5,11 @@
 #
 WrapperID = 'category-cloud'
 
-# Sass block to apply to the wrapper.
+# Sass (or CSS) to apply to the wrapper.
 #
 Wrapper = ''
 
-# Sass block to apply to links.
+# Sass (or CSS) to apply to links.
 #
 Link = ''
 
@@ -32,4 +32,8 @@ MinWeigth = 200
 # Whether to display parenthesized page counts along
 # with the category names.
 #
-DisplayPageCounts = true
+DisplayPageCounts = false
+
+# Whether to wrap category links with <nobr>
+#
+UnbreakableLinks = true

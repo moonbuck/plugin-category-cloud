@@ -1,54 +1,52 @@
 {{ define "main" -}}
   
-  {{/* Make sure the plugin parameters have been loaded. */}}
+  {{- /* Make sure the plugin parameters have been loaded. */ -}}
   {{- if not (.Scratch.Get "plugin-category-cloud.Parameters") -}}
     {{- partial "plugin-category-cloud/load-parameters.html" . -}}
   {{- end -}}
 
-  {{/* Fetch the loaded parameter values. */}}
+  {{- /* Fetch the loaded parameter values. */ -}}
   {{- $Parameters := .Scratch.Get "plugin-category-cloud.Parameters" -}}
   
-  {{/* Calculate the step assignments */}}
+  {{- /* Calculate the step assignments */ -}}
   {{- $Steps := partial "plugin-category-cloud/assign-steps.html" . -}}
 
-{{/* Open up the wrapper. */}}
+{{- /* Open up the wrapper. */ -}}
 <div id="{{ $Parameters.Style.WrapperID }}">
     
-  {{/* Iterate over the non-excluded categories. */}}
+  {{- /* Iterate over the non-excluded categories. */ -}}
   {{- range $name, 
             $taxonomy := site.Taxonomies.categories -}}
-    {{- if not (in $Parameters.Config.ExclusionList $name) -}}
-    {{/* Fetch the assigned step. */}}
-    {{- $step := index $Steps ($taxonomy.Count | string) -}}    
+            
+    {{- if not (in $Parameters.Names.ExclusionList $name) -}}
     
-    {{/* Generate the link's target. */}}
-    {{- $href := path.Join ("/categories/" | relLangURL) $name }}
+      {{- /* Fetch the assigned step. */ -}}
+      {{- $step := index $Steps ($taxonomy.Count | string) -}}    
+      
+      {{- /* Generate the link's target. */ -}}
+      {{- $href := index $Parameters.MenuURLs $name
+                   | default (path.Join ("/categories/" | relLangURL) $name) -}}
+        
+      {{- /* Overwrite the anchorized name. */ -}}
+      {{- $name = index $Parameters.Names.DisplayNames $name 
+                  | default (cond $Parameters.Names.Humanize
+                            (delimit (apply (split $name "-") 
+                                            "humanize" 
+                                            ".") 
+                                     " ")
+                            $name) -}}
+                            
+    {{- /* Create the link for this category. */ -}}
+    <a href="{{ $href | safeURL }}" class="step-{{ $step }}">
+      {{- if $Parameters.Style.UnbreakableLinks }}<nobr>{{ end -}}
+      {{- $name }}<span> ({{ $taxonomy.Count }})</span>
+      {{- if $Parameters.Style.UnbreakableLinks }}</nobr>{{ end -}}
+    </a> 
     
-    {{/* Overwrite with menu matched URL if present. */}}
-    {{- with (index $Parameters.MenuURLs $name) }}{{ $href = . }}{{ end -}}
-
-    {{/* Overwrite the anchorized name with its provided display name. */}}
-    {{- with (index $Parameters.Config.DisplayNames $name) }}
-      {{- $name = . -}}
-
-    {{/* Otherwise, humanize the anchorized name when flagged. */}}
-    {{- else -}}
-      {{- if $Parameters.Config.Humanize -}}            
-        {{- $name = delimit (apply (split $name "-") "humanize" ".") " " -}}           
-      {{- end -}} 
-    {{- end -}}
-
-  {{/* Create the link for this category. */}}
-  <a href="{{ $href | safeURL }}" class="step-{{ $step }}">
-    {{- if $Parameters.Config.UnbreakableLinks }}<nobr>{{ end -}}
-    {{- $name }}<span> ({{ $taxonomy.Count }})</span>
-    {{- if $Parameters.Config.UnbreakableLinks }}</nobr>{{ end -}}
-  </a> 
-  
-  {{- end -}}
-  {{- end -}} {{/* range $anchorized_name… */}}
-
-{{/* Close the wrapper. */}}
-</div>
+    {{- end -}} {{- /* if not (in $Parameters.Names… */ -}}
     
-{{- end -}} {{/* define "main" */}}
+  {{- end -}} {{- /* range $name, $taxonomy… */ -}}
+
+</div> {{- /* Close the wrapper. */ -}}
+    
+{{- end }}
