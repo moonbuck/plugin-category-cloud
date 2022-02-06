@@ -22,11 +22,11 @@ Fingerprint = true
 SassOutput = 'compact'
 
 # The relative paths of pages that should link to the stylesheet.
-# Leave the array empty to always link to the stylesheet. The stylesheet
-# is always linked for the page generated at /cloud/. If you want to 
-# remove the generated page from the menu and/or insert the cloud elsewhere
-# you can enter the relative page path(s) here to ensure the stylesheet 
-# is linked for pages wherein you've inserted an invocation of the partial
+# The stylesheet  is always linked for the page generated at /cloud/. 
+# If you want to remove the generated page from the menu and/or insert 
+# the cloud elsewhere you can enter the relative page path(s) here to
+# ensure the stylesheet is linked for pages wherein you've inserted 
+# an invocation of the partial
 # (i.e. {{ partial "plugin-category-cloud/category-cloud.html" . }}).
 # 
 # For example, the relative path of the home page would be '/'. The
